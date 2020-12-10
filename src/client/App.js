@@ -1,32 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { HashRouter, Route } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState, useEffect } from "react";
 
-// store
-import { getSchools } from './store/store';
-
-//components 
-
+//components
+import DisplayMap from "./DisplayMap";
 
 const App = () => {
-
-	// map dispatch
-	const dispatch = useDispatch();
-
-	// componentdidmount
-	useEffect( () => {
-		// load data
-		dispatch(getSchools());
-	});
-
-	// mapstate
-	const schools = useSelector( ({ schools }) => schools );
-
-	return (
-		<HashRouter>
-			<Route path='/' render={ () => <h1>my fullstack template with redux dont touch it grrrr</h1> } />
-		</HashRouter>
-	);
+  return <DisplayMap />;
 };
 
 export default App;
