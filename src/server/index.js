@@ -26,10 +26,10 @@ app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message });
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 1337;
 
 // db.sync().then(() => {
-const server = app.listen(port);
+const server = app.listen(port, () => console.log(`running on ${port}`));
 const io = socketio(server);
 require("./socket")(io);
 // });

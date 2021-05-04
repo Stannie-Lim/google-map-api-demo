@@ -5,7 +5,7 @@ import axios from "axios";
 import { API_KEY } from "./secrets";
 
 // map module
-import { GoogleMap, LoadScript } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 const containerStyle = {
   width: "1500px",
@@ -13,37 +13,57 @@ const containerStyle = {
 };
 
 function DisplayMap() {
-  const [map, setMap] = React.useState(null);
+  // coordinates for 5 hanover square aka fullstack building
   const [latitude, setLatitude] = useState(40.7128);
   const [longitude, setLongitude] = useState(-74.006);
+
+  const [pin, setPin] = useState({
+    latitude,
+    longitude,
+  });
 
   const center = {
     lat: latitude,
     lng: longitude,
   };
 
-  const getLatAndLongFromAddress = async (address) => {
-    // im gonna translate the address to a lat and long
-    address = encodeURIComponent("5 Hanover Square");
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${API_KEY}`;
-    const { data } = await axios.get(url);
-    console.log(data);
-
-    // once you get the API_KEY working, this entire thing should work
-    // "data" should have a latitude and a longitude
-    // lets pretend this exists- it most likely does
-    // this lat and long will be the pin that will be loaded onto the map
-    const { lat, long } = data;
-  };
-
   useEffect(() => {
+    const getLatAndLongFromAddress = async (address) => {
+      // translate the address to a lat and long
+      address = encodeURIComponent(address);
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${API_KEY}`;
+      try {
+        const { data } = await axios.get(url);
+        console.log(data);
+        if (data.error_message) {
+          alert(
+            "bad api key so the pin wont work, but at least map still shows"
+          );
+        }
+
+        // once you get the API_KEY working, this entire thing should work
+        // this lat and long will be the pin that will be loaded onto the map
+        const { lat, long } = data;
+        setPin({
+          latitude: lat,
+          longitude: long,
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     const address = "5 Hanover Square";
     getLatAndLongFromAddress(address);
   }, []);
 
-  const onLoad = React.useCallback(function callback(map) {}, []);
+  const onLoad = React.useCallback(function callback(map) {
+    console.log("loaded successfully");
+  }, []);
 
-  const onUnmount = React.useCallback(function callback(map) {}, []);
+  const onUnmount = React.useCallback(function callback(map) {
+    console.log("unmounted successfully");
+  }, []);
 
   return (
     <LoadScript googleMapsApiKey={API_KEY}>
@@ -54,9 +74,8 @@ function DisplayMap() {
         onLoad={onLoad}
         onUnmount={onUnmount}
       >
-        <GoogleMapPin latitude={idk} longitude={idk1} />
+        <Marker latitude={pin.latitude} longitude={pin.longitude} />
         {/* Child components, such as markers, info windows, etc. */}
-        <></>
       </GoogleMap>
     </LoadScript>
   );
